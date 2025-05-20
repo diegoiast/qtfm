@@ -1134,7 +1134,7 @@ QVariant myModel::data(const QModelIndex & index, int role) const {
   // Alignment of filename
   else if (role == Qt::TextAlignmentRole) {
     if (index.column() == 1) {
-      return Qt::AlignRight + Qt::AlignVCenter;
+      return QVariant::fromValue(Qt::AlignRight | Qt::AlignVCenter);
     }
   }
   // Display information about file
@@ -1161,7 +1161,7 @@ QVariant myModel::data(const QModelIndex & index, int role) const {
         data = item->mMimeType;
         break;
       case 3 :
-        data = item->fileInfo().lastModified().toString(Qt::LocalDate);
+        data = item->fileInfo().lastModified().toString(Qt::TextDate);
         break;
       case 4 : {
         if (item->mPermissions.isNull()) {
@@ -1466,7 +1466,7 @@ QVariant myModel::headerData(int section, Qt::Orientation orientation, int role)
 //---------------------------------------------------------------------------------------
 Qt::ItemFlags myModel::flags(const QModelIndex &index) const
 {
-    if(!index.isValid()) return Q_NULLPTR;
+    if(!index.isValid()) return {};
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 }
 

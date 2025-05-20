@@ -215,8 +215,8 @@ PropertiesDialog::PropertiesDialog(QStringList paths, myModel *modelList) {
 
     permissionsNumeric->setText(permString);
 
-    QRegExp input("^[0-7]*$");
-    QValidator *permNumericValidator = new QRegExpValidator(input, this);
+    QRegularExpression input("^[0-7]{0,3}$");
+    QValidator *permNumericValidator = new QRegularExpressionValidator(input, this);
     permissionsNumeric->setValidator(permNumericValidator);
     permissionsNumeric->setMaxLength(3);
 
@@ -250,7 +250,7 @@ PropertiesDialog::PropertiesDialog(QStringList paths, myModel *modelList) {
   layout->addWidget(buttons);
   setLayout(layout);
 
-  layout->setMargin(6);
+  layout->setContentsMargins(6, 6, 6, 6);
   layout->setSpacing(4);
 
   connect(this, SIGNAL(updateSignal()), this, SLOT(update()));
@@ -260,7 +260,9 @@ PropertiesDialog::PropertiesDialog(QStringList paths, myModel *modelList) {
   setMinimumSize(size());
 
   this->setAttribute(Qt::WA_DeleteOnClose,1);
-  thread = QtConcurrent::run(this, &PropertiesDialog::folderProperties, paths);
+  thread = QtConcurrent::run([this, paths]() {
+      this->folderProperties(paths);
+  });
 }
 //---------------------------------------------------------------------------
 

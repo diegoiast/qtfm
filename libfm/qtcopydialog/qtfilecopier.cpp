@@ -511,7 +511,7 @@ struct FollowLinksNode : public ChainNode {
         CopyRequest &r = request();
         QFileInfo fis(r.source);
         if (fis.isSymLink() && !(r.copyFlags & QtFileCopier::FollowLinks)) {
-            QFileInfo fil(fis.readLink());
+            QFileInfo fil(fis.readSymLink());
             QString linkName = fil.filePath();
 #if defined(Q_OS_WIN32)
 	    linkName = fil.absoluteFilePath();
@@ -1141,7 +1141,9 @@ QMap<int, CopyRequest> QtFileCopierPrivate::copyDirectoryContents(const QString 
             QFileInfo newfid(destDir.filePath(dirName));
             QMap<int, CopyRequest> childDir = copyDirectoryContents(newfis.filePath(),
                             newfid.filePath(), flags, move);
-            resultList.unite(childDir);
+            for (const auto &key : childDir.keys()) {
+                resultList.insert(key, childDir.value(key));
+            }
             resultList[curId].childrenQueue.enqueue(childDir.constBegin().key());
         }
     }

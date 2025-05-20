@@ -12,7 +12,7 @@
 #include <QDebug>
 #include <QIcon>
 #include <QDirIterator>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QMap>
 #include <QMapIterator>
@@ -166,7 +166,9 @@ QString Common::findIconInDir(QString appPath,
         QString iconName = QFileInfo(found).completeBaseName();
         if (iconName == icon) {
             for (int i=0;i<iconSizes.size();++i) {
-                QString hasFile = found.replace(QRegExp("/[.*]x[.*]/"),QString("/%1x%1/").arg(iconSizes.at(i)));
+                static QRegularExpression re("/\\d+x\\d+/"); // match e.g. "/16x16/"
+                QString hasFile = found;
+                hasFile.replace(re, QString("/%1x%1/").arg(iconSizes.at(i)));                
                 if (QFile::exists(hasFile)) { return hasFile; }
             }
             return found;
@@ -182,7 +184,8 @@ QString Common::findIconInDir(QString appPath,
             QString iconName = QFileInfo(found).completeBaseName();
             if (iconName == icon) {
                 for (int i=0;i<iconSizes.size();++i) {
-                    QString hasFile = found.replace(QRegExp("/[.*]x[.*]/"),QString("/%1x%1/").arg(iconSizes.at(i)));
+                    static QRegularExpression re("/\\d+x\\d+/"); // match e.g. "/16x16/"
+                    QString hasFile = found;
                     if (QFile::exists(hasFile)) { return hasFile; }
                 }
                 return found;
@@ -348,7 +351,8 @@ QStringList Common::getPixmaps(QString appPath)
     QStringList result;
     QStringList pixs = pixmapLocations(appPath);
     for (int i=0;i<pixs.size();++i) {
-        QDir pixmaps(pixs.at(i), "",  Q_NULLPTR, QDir::Files | QDir::NoDotAndDotDot);
+        QDir pixmaps(pixs.at(i));
+        pixmaps.setFilter(QDir::Files | QDir::NoDotAndDotDot);
         for (int i=0;i<pixmaps.entryList().size();++i) {
             result << QString("%1/%2").arg(pixmaps.absolutePath()).arg(pixmaps.entryList().at(i));
         }
